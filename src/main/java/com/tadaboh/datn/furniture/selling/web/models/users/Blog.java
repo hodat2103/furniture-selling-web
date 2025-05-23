@@ -20,8 +20,12 @@ public class Blog extends AuditableEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "content", nullable = false)
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String content;
+
+    @Column(name = "slug", unique = true)
+    private String slug;
 
     @Column(name = "image_url")
     private String imageUrl;

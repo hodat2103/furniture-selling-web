@@ -22,7 +22,7 @@ public class ProductResponse extends AuditableResponse {
     private String code;
     private String name;
     private String slug;
-    private ProductTagEnum tag;
+    private String tag;
     private BigDecimal price;
 
     @JsonProperty("category_id")

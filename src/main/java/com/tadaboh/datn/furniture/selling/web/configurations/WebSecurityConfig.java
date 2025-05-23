@@ -66,7 +66,8 @@ public class WebSecurityConfig {
             "/api/v1/roles/**",
             "/api/v1/permissions/**",
             "/api/v1/home/**",
-            "/oauth2/**"
+            "/oauth2/**",
+            "/api/v1/auth/resend-verify-code",
     };
 
     /**

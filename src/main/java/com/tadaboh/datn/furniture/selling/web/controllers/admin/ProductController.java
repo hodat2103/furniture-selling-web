@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -87,7 +88,7 @@ public class ProductController {
         ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.ACCEPTED, "Get stock of product" ,stock);
         return ResponseEntity.ok(responseSuccess);
     }
-    @GetMapping("/tag/{tag}")
+    @GetMapping("/tag")
     public ResponseEntity<ResponseSuccess> getById(@RequestParam String tag,
                                                    @RequestParam(defaultValue = "0") @Min(0) int page,
                                                    @RequestParam(defaultValue = "9") @Min(1) @Max(15) int size){
@@ -96,26 +97,27 @@ public class ProductController {
         ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.ACCEPTED, "",productResponses );
         return ResponseEntity.ok(responseSuccess);
     }
-    @GetMapping("")
-    public ResponseEntity<ResponseSuccess> filterProduct(@RequestParam(name = "", required = false)  String slug,
-                                                 @RequestParam(name = "category_id", required = false) Long categoryId,
-                                                 @RequestParam(name = "supplier_id", required = false) Long supplierId,
-                                                 @RequestParam(name = "min_price", required = false)BigDecimal minPrice,
-                                                 @RequestParam(name = "max_price", required = false) BigDecimal maxPrice,
-                                                 @RequestParam(defaultValue = "0") @Min(0) int page,
-                                                 @RequestParam(defaultValue = "9") @Min(1) @Max(15) int size){
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<ProductResponse> productResponses = productService.filterProduct(slug,categoryId,supplierId,minPrice,maxPrice,pageRequest);
-        int totalPage = productResponses.getTotalPages();
-        if(totalPage == 0){
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        }
-        ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.ACCEPTED, "",productResponses );
-        return ResponseEntity.ok(responseSuccess);
-    }
+ @GetMapping("")
+ public ResponseEntity<ResponseSuccess> filterProduct(@RequestParam(name = "", required = false) String slug,
+                                              @RequestParam(name = "category_id", required = false) Long categoryId,
+                                              @RequestParam(name = "supplier_id", required = false) Long supplierId,
+                                              @RequestParam(name = "min_price", required = false) BigDecimal minPrice,
+                                              @RequestParam(name = "max_price", required = false) BigDecimal maxPrice,
+                                              @RequestParam(defaultValue = "0") @Min(0) int page,
+                                              @RequestParam(defaultValue = "9") @Min(1) @Max(15) int size,
+                                              @RequestParam(defaultValue = "desc") String sort) {
+     PageRequest pageRequest = PageRequest.of(page, size, sort.equalsIgnoreCase("asc") ? Sort.by("createdAt").ascending() : Sort.by("createdAt").descending());
+     Page<ProductResponse> productResponses = productService.filterProduct(slug, categoryId, supplierId, minPrice, maxPrice, pageRequest);
+     int totalPage = productResponses.getTotalPages();
+     if (totalPage == 0) {
+         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+     }
+     ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.ACCEPTED, "", productResponses);
+     return ResponseEntity.ok(responseSuccess);
+ }
 
-    @GetMapping("/image-url-list/{id}")
-    public ResponseEntity<ResponseSuccess> getImageUrlFromPublicId(@PathVariable(name = "id")  Long productItemId) throws Exception {
+    @GetMapping("/image-url-list/{product_item_id}")
+    public ResponseEntity<ResponseSuccess> getImageUrlFromPublicId(@PathVariable(name = "product_item_id")  Long productItemId) throws Exception {
         List<String> imageUrlList = productService.getImageUrlFromPublicId(productItemId);
         ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.OK, "",imageUrlList );
         return ResponseEntity.ok(responseSuccess);

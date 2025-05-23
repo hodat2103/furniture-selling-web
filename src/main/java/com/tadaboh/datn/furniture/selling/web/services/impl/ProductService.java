@@ -63,7 +63,7 @@ public class ProductService implements IProductService {
         product.setCode(GenerateCode.generateProductCode());
         product.setSlug(GenerateCode.generateSlug(productRequest.getName()));
         product.setName(productRequest.getName());
-        product.setTag(productRequest.getTag());
+        product.setTag(productRequest.getTag().name());
         product.setPrice(productRequest.getPrice());
         product.setSupplier(existingSupplier);
         product.setCategory(existingCategory);
@@ -110,7 +110,7 @@ public class ProductService implements IProductService {
         existingProduct.setCode(GenerateCode.generateProductCode());
         existingProduct.setSlug(GenerateCode.generateSlug(productRequest.getName()));
         existingProduct.setName(productRequest.getName());
-        existingProduct.setTag(productRequest.getTag());
+        existingProduct.setTag(productRequest.getTag().name());
         existingProduct.setPrice(productRequest.getPrice());
         existingProduct.setSupplier(existingSupplier);
         existingProduct.setCategory(existingCategory);

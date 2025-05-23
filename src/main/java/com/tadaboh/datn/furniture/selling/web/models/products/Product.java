@@ -36,9 +36,8 @@ public class Product extends AuditableEntity {
     @Column(name = "price")
     private BigDecimal price;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "tag")
-    private ProductTagEnum tag;
+    private String tag;
 
     @Column(name = "is_active")
     private Boolean isActive;
