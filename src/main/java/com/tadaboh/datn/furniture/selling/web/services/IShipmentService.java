@@ -9,7 +9,7 @@ import java.util.List;
 public interface IShipmentService {
     ShipmentResponse createShipmentForOrder(ShipmentRequest shipmentRequest);
 
-    ShipmentResponse updateShipment(String shipmentCode, String shipmentMethod, String trackingNumber);
+    ShipmentResponse updateStatus(String shipmentCode, String shipmentStatus);
 
     void deleteShipment(String shipmentCode);
 

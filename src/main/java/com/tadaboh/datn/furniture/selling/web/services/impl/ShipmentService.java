@@ -112,8 +112,16 @@ public class ShipmentService implements IShipmentService {
     }
 
     @Override
-    public ShipmentResponse updateShipment(String shipmentCode, String shipmentMethod, String trackingNumber) {
-        return null;
+    public ShipmentResponse updateStatus(String shipmentCode, String shipmentStatus) {
+        Optional<Shipment> shipmentOptional = Optional.ofNullable(shipmentRepository.findByCode(shipmentCode));
+        if (shipmentOptional.isPresent()) {
+            Shipment shipment = shipmentOptional.get();
+            shipment.setStatus(shipmentStatus);
+            shipmentRepository.save(shipment);
+            return ShipmentResponse.fromShipment(shipment);
+        } else {
+            throw new DataNotFoundException("Shipment not found for code: " + shipmentCode);
+        }
     }
 
     @Override
