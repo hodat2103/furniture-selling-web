@@ -63,6 +63,7 @@ public class WebSecurityConfig {
             "/api/v1/suppliers/**",
             "/api/v1/products/**",
             "/api/v1/size-option/**",
+            "/api/v1/orders/**",
             "/api/v1/roles/**",
             "/api/v1/permissions/**",
             "/api/v1/home/**",

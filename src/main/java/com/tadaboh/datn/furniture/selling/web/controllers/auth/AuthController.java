@@ -26,7 +26,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("${api.prefix}auth")
-@CrossOrigin(origins = "http://localhost:3000")
 @Tag(name = "Authentication")
 @RequiredArgsConstructor
 public class AuthController {

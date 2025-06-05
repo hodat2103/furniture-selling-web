@@ -175,7 +175,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public ProductResponse getBySlug(String slug) {
+    public ProductResponse getBySlug(String slug) throws Exception {
         if (slug == null) {
             throw new DataNotFoundException("Don't empty slug");
         }
@@ -185,11 +185,11 @@ public class ProductService implements IProductService {
         }
         ProductItem productItem = productItemRepository.findByProductId(product.getId());
         List<ProductImage> productImages = productImageRepository.findByProductItemIdAndImageType(productItem.getId());
-        return ProductResponse.fromProduct(product, productImages);
+        return ProductResponse.fromProduct(product,  getImageUrlFromProductImages(productImages));
     }
 
     @Override
-    public ProductResponse getByCode(String code) {
+    public ProductResponse getByCode(String code) throws Exception {
         if (code == null) {
             throw new DataNotFoundException("Can't empty code");
         }
@@ -199,11 +199,11 @@ public class ProductService implements IProductService {
         }
         ProductItem productItem = productItemRepository.findByProductId(product.getId());
         List<ProductImage> productImages = productImageRepository.findByProductItemIdAndImageType(productItem.getId());
-        return ProductResponse.fromProduct(product, productImages);
+        return ProductResponse.fromProduct(product,  getImageUrlFromProductImages(productImages));
     }
 
     @Override
-    public Page<ProductResponse> getByCategoryId(Long categoryId, Pageable pageable) {
+    public Page<ProductResponse> getByCategoryId(Long categoryId, Pageable pageable) throws Exception {
         Category existingCategory = categoryRepository.findById(categoryId).orElseThrow(
                 () -> new DataNotFoundException("Category not found")
         );
@@ -213,7 +213,7 @@ public class ProductService implements IProductService {
             ProductItem productItem = productItemRepository.findByProductId(product.getId());
             List<ProductImage> productImages = productImageRepository.findByProductItemIdAndImageType(productItem.getId());
             List<ProductResponse> productResponseList = productResponses.getContent();
-            productResponseList.add(ProductResponse.fromProduct(product, productImages));
+            productResponseList.add(ProductResponse.fromProduct(product,  getImageUrlFromProductImages(productImages)));
             productResponses = new PageImpl<>(productResponseList, pageable, products.size());        }
         return productResponses;
     }
@@ -231,9 +231,10 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public List<String> getImageUrlFromPublicId(Long productItemId) throws Exception {
+    public List<String> getImageUrlFromPublicId(Long productId) throws Exception {
+        ProductItem productItem = productItemRepository.findByProductId(productId);
         List<String> imageUrlList = new ArrayList<>();
-        List<ProductImage> productImages = productImageRepository.findByProductItemId(productItemId);
+        List<ProductImage> productImages = productImageRepository.findByProductItemId(productItem.getId());
         for (ProductImage productImage : productImages){
             String imageUrl = cloudinaryService.getResourceUrlFromCloudinary(ConstantKey.RESOURCE_TYPE_IMAGE, productImage.getImageUrl());
             imageUrlList.add(imageUrl);
@@ -270,15 +271,28 @@ public class ProductService implements IProductService {
 //        });
 //    }
         private Page<ProductResponse> mapToProductResponse(Page<Product> products) {
-            return products.map(product -> mapProductToProductResponse(product));
+            return products.map(product -> {
+                try {
+                    return mapProductToProductResponse(product);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
 
-            private ProductResponse mapProductToProductResponse(Product product) {
+            private ProductResponse mapProductToProductResponse(Product product) throws Exception {
                 ProductItem productItem = productItemRepository.findByProductId(product.getId());
                 if (productItem == null) {
                     throw new DataNotFoundException("Product item not found");
                 }
                 List<ProductImage> productImages = productImageRepository.findByProductItemIdAndImageType(productItem.getId());
-                return ProductResponse.fromProduct(product, productImages);
+                return ProductResponse.fromProductAll(product, productItem.getStock(),getImageUrlFromProductImages(productImages));
     }
+    private String getImageUrlFromProductImages(List<ProductImage> productImages) throws Exception {
+        if (productImages.isEmpty()) {
+            throw new DataNotFoundException("Product image not found");
+        }
+        return cloudinaryService.getResourceUrlFromCloudinary(ConstantKey.RESOURCE_TYPE_IMAGE, productImages.get(0).getImageUrl());
+    }
+
 }

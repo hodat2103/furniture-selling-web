@@ -1,14 +1,22 @@
 package com.tadaboh.datn.furniture.selling.web.controllers.user;
 
+import com.paypal.api.payments.Links;
+import com.paypal.api.payments.Payment;
+import com.paypal.base.rest.PayPalRESTException;
 import com.tadaboh.datn.furniture.selling.web.configurations.VNPayConfig;
-import com.tadaboh.datn.furniture.selling.web.dtos.response.data.PaymentResponse;
+import com.tadaboh.datn.furniture.selling.web.dtos.response.data.PaymentVNPAYResponse;
 import com.tadaboh.datn.furniture.selling.web.dtos.response.data.TransactionStatusResponse;
-import com.tadaboh.datn.furniture.selling.web.enums.OrderStatusEnum;
+import com.tadaboh.datn.furniture.selling.web.enums.PaypalPaymentIntent;
+import com.tadaboh.datn.furniture.selling.web.enums.PaypalPaymentMethod;
 import com.tadaboh.datn.furniture.selling.web.exceptions.DataNotFoundException;
-import com.tadaboh.datn.furniture.selling.web.models.users.Order;
 import com.tadaboh.datn.furniture.selling.web.repositories.OrderRepository;
+//import com.tadaboh.datn.furniture.selling.web.services.impl.PaypalService;
+import com.tadaboh.datn.furniture.selling.web.utils.PaypalUrlUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +32,12 @@ import java.util.*;
 @RequestMapping("${api.prefix}payments")
 @RequiredArgsConstructor
 public class PaymentController {
+    public static final String PAYPAL_SUCCESS_URL = "pay/success";
+    public static final String PAYPAL_CANCEL_URL = "pay/cancel";
+
+    private Logger log = LoggerFactory.getLogger(getClass());
+
+//    private final PaypalService paypalService;
     private final OrderRepository orderRepository;
 
     @GetMapping("/create-payment")
@@ -95,12 +109,12 @@ public class PaymentController {
         String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
 
 
-        PaymentResponse paymentResponse = PaymentResponse.builder()
+        PaymentVNPAYResponse paymentVNPAYResponse = PaymentVNPAYResponse.builder()
                 .status("OK")
                 .message("")
                 .url(paymentUrl)
                 .build();
-        return ResponseEntity.status(HttpStatus.OK).body(paymentResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(paymentVNPAYResponse);
     }
     @GetMapping("/check-payment")
     public ResponseEntity<?> transaction(
@@ -121,7 +135,7 @@ public class PaymentController {
         if (responseCode.equals("00")){
             transactionStatusResponse = TransactionStatusResponse.builder()
                     .status("Accepted")
-                    .message("")
+                    .message("Payment successful")
                     .data("https://sandbox.vnpayment.vn/apis/vnpay-demo/")
                     .build();
 
@@ -139,9 +153,52 @@ public class PaymentController {
 //            this.orderRepository.save(order);
             return ResponseEntity.badRequest().body(TransactionStatusResponse.builder()
                     .status("Failed")
-                    .message("")
-                    .data("https://www.facebook.com/")  // Redirect to the homeclient page
+                    .message("Payment failed")
+                    .data("localhost:5173")  // Redirect to the homeclient page
                     .build());
         }
     }
+
+//    @PostMapping("pay")
+//    public String pay(HttpServletRequest request){
+//        String cancelUrl = PaypalUrlUtils.getBaseURl(request) + "/" + PAYPAL_CANCEL_URL;
+//        String successUrl = PaypalUrlUtils.getBaseURl(request) + "/" + PAYPAL_SUCCESS_URL;
+//        try {
+//            Payment payment = paypalService.createPayment(
+//                    4.00,
+//                    "USD",
+//                    PaypalPaymentMethod.PAYPAL,
+//                    PaypalPaymentIntent.SALE,
+//                    "payment description",
+//                    cancelUrl,
+//                    successUrl);
+//            for(Links links : payment.getLinks()){
+//                if(links.getRel().equals("approval_url")){
+//                    return "redirect:" + links.getHref();
+//                }
+//            }
+//        } catch (PayPalRESTException e) {
+//            log.error(e.getMessage());
+//        }
+//        return "redirect:/";
+//    }
+//
+//    @GetMapping(PAYPAL_CANCEL_URL)
+//    public String cancelPay(){
+//        return "cancel";
+//    }
+//
+//    @RequestMapping(method = RequestMethod.GET, value = PAYPAL_SUCCESS_URL)
+//    public String successPay(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId){
+//        try {
+//            Payment payment = paypalService.executePayment(paymentId, payerId);
+//            if(payment.getState().equals("approved")){
+//                return "success";
+//            }
+//        } catch (PayPalRESTException e) {
+//            log.error(e.getMessage());
+//        }
+//        return "redirect:/";
+//    }
+
 }

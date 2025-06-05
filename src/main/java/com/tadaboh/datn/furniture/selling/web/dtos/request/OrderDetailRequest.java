@@ -9,7 +9,7 @@ import lombok.Data;
 public class OrderDetailRequest {
 
     @JsonProperty("product_item_id")
-    private Long productItemId;
+    private Long productId;
 
     @JsonProperty("quantity")
     private int quantity;

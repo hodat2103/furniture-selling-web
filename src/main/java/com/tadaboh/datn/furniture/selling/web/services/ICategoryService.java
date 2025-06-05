@@ -13,7 +13,7 @@ public interface ICategoryService {
     CategoryResponse update(Long id, CategoryRequest categoryRequest);
 
     void delete(Long id);
-
+    CategoryResponse getById(Long id);
     List<CategoryResponse> getAllCategory();
     CategoryResponse getCategoryBySlug(String slug);
     List<CategoryResponse> getCategoryByParentId(Long parentId);

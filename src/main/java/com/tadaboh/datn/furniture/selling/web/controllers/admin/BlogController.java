@@ -27,7 +27,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin
 @RequestMapping("${api.prefix}blogs")
 @Tag(name = "Blog", description = "Blog API")
 public class BlogController {

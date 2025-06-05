@@ -28,7 +28,6 @@ import java.util.List;
 @RestController
 @RequestMapping("${api.prefix}products")
 @RequiredArgsConstructor
-@CrossOrigin
 @Tag(name = "Product", description = "Product API")
 public class ProductController {
     private final IProductService productService;
@@ -57,7 +56,7 @@ public class ProductController {
     @GetMapping("/categories/{category_id}")
     public ResponseEntity<ResponseSuccess> getByCategoryId(@PathVariable(name = "category_id") Long categoryId,
                                                            @RequestParam(defaultValue = "0") @Min(0) int page,
-                                                           @RequestParam(defaultValue = "12") @Min(1) @Max(15) int size){
+                                                           @RequestParam(defaultValue = "12") @Min(1) @Max(15) int size) throws Exception {
         Pageable pageable = PageRequest.of(page, size);
         Page<ProductResponse> productResponses = productService.getByCategoryId(categoryId,pageable);
         ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.ACCEPTED, "",productResponses );
@@ -71,13 +70,13 @@ public class ProductController {
     }
 
     @GetMapping("/code/{code}")
-    public ResponseEntity<ResponseSuccess> getByCode(@PathVariable String code){
+    public ResponseEntity<ResponseSuccess> getByCode(@PathVariable String code) throws Exception {
         ProductResponse productResponse = productService.getByCode(code);
         ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.ACCEPTED, "",productResponse );
         return ResponseEntity.ok(responseSuccess);
     }
     @GetMapping("/slug/{slug}")
-    public ResponseEntity<ResponseSuccess> getBySlug(@PathVariable String slug){
+    public ResponseEntity<ResponseSuccess> getBySlug(@PathVariable String slug) throws Exception {
         ProductResponse productResponse = productService.getBySlug(slug);
         ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.ACCEPTED, "",productResponse );
         return ResponseEntity.ok(responseSuccess);
@@ -97,28 +96,28 @@ public class ProductController {
         ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.ACCEPTED, "",productResponses );
         return ResponseEntity.ok(responseSuccess);
     }
- @GetMapping("")
- public ResponseEntity<ResponseSuccess> filterProduct(@RequestParam(name = "", required = false) String slug,
-                                              @RequestParam(name = "category_id", required = false) Long categoryId,
-                                              @RequestParam(name = "supplier_id", required = false) Long supplierId,
-                                              @RequestParam(name = "min_price", required = false) BigDecimal minPrice,
-                                              @RequestParam(name = "max_price", required = false) BigDecimal maxPrice,
-                                              @RequestParam(defaultValue = "0") @Min(0) int page,
-                                              @RequestParam(defaultValue = "9") @Min(1) @Max(15) int size,
-                                              @RequestParam(defaultValue = "desc") String sort) {
-     PageRequest pageRequest = PageRequest.of(page, size, sort.equalsIgnoreCase("asc") ? Sort.by("createdAt").ascending() : Sort.by("createdAt").descending());
-     Page<ProductResponse> productResponses = productService.filterProduct(slug, categoryId, supplierId, minPrice, maxPrice, pageRequest);
-     int totalPage = productResponses.getTotalPages();
-     if (totalPage == 0) {
-         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+     @GetMapping("")
+     public ResponseEntity<ResponseSuccess> filterProduct(@RequestParam(name = "", required = false) String slug,
+                                                  @RequestParam(name = "category_id", required = false) Long categoryId,
+                                                  @RequestParam(name = "supplier_id", required = false) Long supplierId,
+                                                  @RequestParam(name = "min_price", required = false) BigDecimal minPrice,
+                                                  @RequestParam(name = "max_price", required = false) BigDecimal maxPrice,
+                                                  @RequestParam(defaultValue = "0") @Min(0) int page,
+                                                  @RequestParam(defaultValue = "9") @Min(1) @Max(15) int size,
+                                                  @RequestParam(defaultValue = "desc") String sort) {
+         PageRequest pageRequest = PageRequest.of(page, size, sort.equalsIgnoreCase("asc") ? Sort.by("createdAt").ascending() : Sort.by("createdAt").descending());
+         Page<ProductResponse> productResponses = productService.filterProduct(slug, categoryId, supplierId, minPrice, maxPrice, pageRequest);
+         int totalPage = productResponses.getTotalPages();
+         if (totalPage == 0) {
+             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+         }
+         ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.ACCEPTED, "", productResponses);
+         return ResponseEntity.ok(responseSuccess);
      }
-     ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.ACCEPTED, "", productResponses);
-     return ResponseEntity.ok(responseSuccess);
- }
 
-    @GetMapping("/image-url-list/{product_item_id}")
-    public ResponseEntity<ResponseSuccess> getImageUrlFromPublicId(@PathVariable(name = "product_item_id")  Long productItemId) throws Exception {
-        List<String> imageUrlList = productService.getImageUrlFromPublicId(productItemId);
+    @GetMapping("/image-url-list/{product_id}")
+    public ResponseEntity<ResponseSuccess> getImageUrlFromPublicId(@PathVariable(name = "product_id")  Long productId) throws Exception {
+        List<String> imageUrlList = productService.getImageUrlFromPublicId(productId);
         ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.OK, "",imageUrlList );
         return ResponseEntity.ok(responseSuccess);
     }

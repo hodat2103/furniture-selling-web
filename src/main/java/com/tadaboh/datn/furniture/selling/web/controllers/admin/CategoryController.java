@@ -54,7 +54,7 @@ public class CategoryController {
         return ResponseEntity.ok(responseSuccess);
     }
 
-    @GetMapping("/{slug}")
+    @GetMapping("/slug/{slug}")
     public ResponseEntity<?> get(@PathVariable String slug) {
         CategoryResponse categoryResponse = categoryService.getCategoryBySlug(slug);
         ResponseSuccess responseSuccess = new ResponseSuccess(
@@ -64,6 +64,17 @@ public class CategoryController {
         );
         return ResponseEntity.ok(responseSuccess);
     }
+    @GetMapping("/{category_id}")
+    public ResponseEntity<?> getById(@PathVariable(name = "category_id") Long categoryId) {
+        CategoryResponse categoryResponse = categoryService.getById(categoryId);
+        ResponseSuccess responseSuccess = new ResponseSuccess(
+                HttpStatus.OK,
+                "Get category successfully",
+                categoryResponse.getName()
+        );
+        return ResponseEntity.ok(responseSuccess);
+    }
+
 
     @GetMapping("/parent/{parent_id}")
     public ResponseEntity<?> getByParentId(@PathVariable(name = "parent_id") Long parentId) {

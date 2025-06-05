@@ -1,8 +1,12 @@
 package com.tadaboh.datn.furniture.selling.web.models.categories;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.tadaboh.datn.furniture.selling.web.models.bases.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.repository.EntityGraph;
 
 import java.util.List;
 
@@ -31,9 +35,11 @@ public class Category extends AuditableEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_id", referencedColumnName = "id")
+    @JsonBackReference
     private Category parent;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<Category> subcategories;
 
 }

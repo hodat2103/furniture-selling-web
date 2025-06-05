@@ -106,7 +106,7 @@ public class CloudinaryService {
         }
     }
     public String getResourceUrlFromCloudinary(String resourceType, String publicId) throws Exception {
-        ApiResponse resource =  cloudinaryConfig.cloudinary().api().resource(publicId, ObjectUtils.asMap(
+        ApiResponse resource =  cloudinaryConfig.cloudinary().api().    resource(publicId, ObjectUtils.asMap(
                 "resource_type", resourceType
         ));
 

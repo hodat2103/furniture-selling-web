@@ -69,11 +69,15 @@ public class ShipmentService implements IShipmentService {
     public static Date calculateExpectDeliveryDate(double distance) {
         int daysToAdd;
 
-        if (distance <= 15) {
+        if (distance <=8) {
+            daysToAdd = 1;
+        } else if (distance <= 15) {
             daysToAdd = 2;
-        } else if (distance <= 30) {
+        }  else if (distance <= 25) {
+            daysToAdd = 3;
+        }  else if (distance <= 30) {
             daysToAdd = 4;
-        } else if (distance <= 60) {
+        } else if (distance <= 50) {
             daysToAdd = 6;
         } else {
             daysToAdd = 8;

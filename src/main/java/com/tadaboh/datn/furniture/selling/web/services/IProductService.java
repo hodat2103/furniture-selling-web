@@ -20,11 +20,11 @@ public interface IProductService {
 
     ProductDetailResponse getById(Long id);
 
-    ProductResponse getBySlug(String slug);
+    ProductResponse getBySlug(String slug) throws Exception;
 
-    ProductResponse getByCode(String code);
+    ProductResponse getByCode(String code) throws Exception;
 
-    Page<ProductResponse> getByCategoryId(Long categoryId, Pageable pageable);
+    Page<ProductResponse> getByCategoryId(Long categoryId, Pageable pageable) throws Exception;
 
     Page<ProductResponse> getByTag(String tag, Pageable pageable);
 

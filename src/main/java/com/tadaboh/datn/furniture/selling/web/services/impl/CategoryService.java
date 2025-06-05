@@ -84,6 +84,14 @@ public class CategoryService implements ICategoryService {
         }
         return CategoryResponse.fromCategory(category);
     }
+    @Override
+    public CategoryResponse getById(Long id) {
+        Optional<Category> category = categoryRepository.findById(id);
+        if (category.isEmpty()) {
+            throw new DataNotFoundException("Category not found");
+        }
+        return CategoryResponse.fromCategory(category.orElse(null));
+    }
 
     @Override
     public Set<Category> getAllSubCategories(Long categoryId) {

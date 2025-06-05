@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 public class OrderService implements IOrderService {
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
     private final ProductItemRepository productItemRepository;
+    private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
@@ -61,7 +62,7 @@ public class OrderService implements IOrderService {
                 .orderDate(LocalDateTime.now())
                 .totalPrice(totalPrice)
                 .finalPrice(BigDecimal.ZERO)
-                .status(OrderStatusEnum.PENDING)
+                .status(OrderStatusEnum.PENDING.name())
                 .paymentMethod(orderRequest.getPaymentMethod())
                 .build();
         Order saveOrder = orderRepository.save(order);
@@ -69,8 +70,8 @@ public class OrderService implements IOrderService {
         List<OrderDetail> orderDetails = orderRequest.getOrderDetails().stream()
                 .map(item -> OrderDetail.builder()
                         .order(saveOrder)
-                        .productItem(productItemRepository.findById(item.getProductItemId()).get())
-                        .price(productItemRepository.findById(item.getProductItemId()).get().getProduct().getPrice())
+                        .productItem(productItemRepository.findByProductId(item.getProductId()))
+                        .price(productItemRepository.findByProductId(item.getProductId()).getProduct().getPrice())
                         .quantity(item.getQuantity())
                         .build())
                 .collect(Collectors.toList());
@@ -88,13 +89,13 @@ public class OrderService implements IOrderService {
     }
     private BigDecimal calculateTotalPrice(List<OrderDetailRequest> orderDetails) {
         return orderDetails.stream()
-                .map(item -> productItemRepository.findById(item.getProductItemId()).get().getProduct().getPrice()
+                .map(item -> productItemRepository.findByProductId(item.getProductId()).getProduct().getPrice()
                         .multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
     private BigDecimal calculateFinalPrice(List<OrderDetailRequest> orderDetails) {
         for (OrderDetailRequest orderDetail : orderDetails) {
-            Optional<ProductItem> productItem = productItemRepository.findById(orderDetail.getProductItemId());
+            Optional<ProductItem> productItem = Optional.ofNullable(productItemRepository.findByProductId(orderDetail.getProductId()));
             Long categoryId = productItem.get().getProduct().getCategory().getId();
             List<PromotionCategory> promotionCategories = promotionCategoryRepository.findByCategoryId(categoryId);
             for (PromotionCategory promotionCategory : promotionCategories) {
@@ -137,7 +138,14 @@ public class OrderService implements IOrderService {
                                             LocalDateTime endDateTime,
                                             Pageable pageable) {
 
-        return null;
+        return orderRepository.searchOrders(keyword, fullName, productName, orderCode, startDateTime, endDateTime, pageable)
+                .map(order -> {
+                    List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(order.getId());
+                    List<OrderDetailResponse> orderDetailResponses = orderDetails.stream()
+                            .map(OrderDetailResponse::fromOrderDetail)
+                            .collect(Collectors.toList());
+                    return OrderResponse.fromOrder(order, orderDetailResponses);
+                });
     }
 
     @Override
@@ -162,7 +170,7 @@ public class OrderService implements IOrderService {
         Order order = orderRepository.findById(id).get();
         // chỉ cho hủy khi chưa giao hàng
         if (order.getStatus().equals(OrderStatusEnum.PENDING) && order.getUser().getId().equals(order.getUser().getId())) {
-            order.setStatus(OrderStatusEnum.CANCELLED);
+            order.setStatus(OrderStatusEnum.CANCELLED.name());
 //            List items = order.get().stream().map(item -> item.getId()).collect(Collectors.toList());
 
             // refund amount

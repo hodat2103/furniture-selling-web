@@ -35,9 +35,8 @@ public class Order implements Serializable {
     @Column(name = "final_price")
     private BigDecimal finalPrice;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private OrderStatusEnum status;
+    private String status;
 
     @Column(name = "payment_method")
     private String paymentMethod;

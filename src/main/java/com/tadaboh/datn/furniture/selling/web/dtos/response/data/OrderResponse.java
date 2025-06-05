@@ -1,7 +1,6 @@
 package com.tadaboh.datn.furniture.selling.web.dtos.response.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.tadaboh.datn.furniture.selling.web.enums.OrderStatusEnum;
 import com.tadaboh.datn.furniture.selling.web.models.users.Order;
 import lombok.*;
 
@@ -16,9 +15,10 @@ import java.util.List;
 public class OrderResponse {
 
     private Long id;
+    private String code;
 
-    @JsonProperty("user_id")
-    private Long userId;
+    @JsonProperty("user_name")
+    private String userId;
 
     @JsonProperty("order_date")
     private LocalDateTime orderDate;
@@ -30,7 +30,7 @@ public class OrderResponse {
     private BigDecimal finalPrice;
 
     @JsonProperty("status")
-    private OrderStatusEnum status;
+    private String status;
 
     @JsonProperty("payment_method")
     private String paymentMethod;
@@ -42,7 +42,8 @@ public class OrderResponse {
 
         return OrderResponse.builder()
                 .id(order.getId())
-                .userId(order.getUser().getId())
+                .code(order.getCode())
+                .userId(order.getUser().getFullname())
                 .orderDate(order.getOrderDate())
                 .totalPrice(order.getTotalPrice())
                 .finalPrice(order.getFinalPrice())

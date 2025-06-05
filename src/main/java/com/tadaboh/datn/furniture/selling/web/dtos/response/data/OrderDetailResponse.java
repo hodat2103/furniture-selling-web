@@ -17,7 +17,7 @@ public class OrderDetailResponse {
     private Long orderId;
 
     @JsonProperty("product_item_id")
-    private Long productItem;
+    private String productName;
 
     private BigDecimal price;
 
@@ -28,7 +28,7 @@ public class OrderDetailResponse {
         return OrderDetailResponse.builder()
                 .id(orderDetail.getId())
                 .orderId(orderDetail.getOrder().getId())
-                .productItem(orderDetail.getProductItem().getId())
+                .productName(orderDetail.getProductItem().getProduct().getName())
                 .price(orderDetail.getPrice())
                 .quantity(orderDetail.getQuantity())
                 .build();

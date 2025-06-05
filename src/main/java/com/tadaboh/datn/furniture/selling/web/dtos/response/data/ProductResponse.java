@@ -24,20 +24,23 @@ public class ProductResponse extends AuditableResponse {
     private String slug;
     private String tag;
     private BigDecimal price;
-
+    private int stock;
     @JsonProperty("category_id")
     private Long category;
+
+    @JsonProperty("category_name")
+    private String categoryName;
 
     @JsonProperty("supplier_id")
     private Supplier supplier;
 
-    @JsonProperty("product_images")
-    private List<ProductImage> productImages;
+    @JsonProperty("imageUrl")
+    private String imageUrl;
 
     @JsonProperty("is_active")
     private boolean isActive;
 
-    public static ProductResponse fromProduct(Product product, List<ProductImage> productImages) {
+    public static ProductResponse fromProduct(Product product, String imageUrl) {
 
         ProductResponse productResponse = ProductResponse.builder()
                 .id(product.getId())
@@ -47,8 +50,31 @@ public class ProductResponse extends AuditableResponse {
                 .tag(product.getTag())
                 .price(product.getPrice())
                 .category(product.getCategory().getId())
+                .categoryName(product.getCategory().getName())
                 .supplier(product.getSupplier())
-                .productImages(productImages)
+                .imageUrl(imageUrl)
+                .isActive(product.getIsActive())
+                .build();
+
+        productResponse.setCreatedAt(product.getCreatedAt());
+        productResponse.setUpdatedAt(product.getUpdatedAt());
+
+        return productResponse;
+    }
+    public static ProductResponse fromProductAll(Product product, int stock, String imageUrl) {
+
+        ProductResponse productResponse = ProductResponse.builder()
+                .id(product.getId())
+                .code(product.getCode())
+                .name(product.getName())
+                .slug(product.getSlug())
+                .tag(product.getTag())
+                .price(product.getPrice())
+                .stock(stock)
+                .category(product.getCategory().getId())
+                .categoryName(product.getCategory().getName())
+                .supplier(product.getSupplier())
+                .imageUrl(imageUrl)
                 .isActive(product.getIsActive())
                 .build();
 

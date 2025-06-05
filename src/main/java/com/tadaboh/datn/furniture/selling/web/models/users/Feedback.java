@@ -1,6 +1,8 @@
 package com.tadaboh.datn.furniture.selling.web.models.users;
 
 import com.tadaboh.datn.furniture.selling.web.models.bases.AuditableEntity;
+import com.tadaboh.datn.furniture.selling.web.models.products.Product;
+import com.tadaboh.datn.furniture.selling.web.models.products.ProductItem;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,6 +29,10 @@ public class Feedback extends AuditableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
+    private Product product;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
